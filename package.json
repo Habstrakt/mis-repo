@@ -1,0 +1,20 @@
+{
+  "name": "mis",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@faker-js/faker": "^9.3.0",
+    "@playwright/test": "^1.50.1",
+    "@types/node": "^22.13.1",
+    "allure-commandline": "^2.30.0",
+    "allure-playwright": "^3.0.6"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
