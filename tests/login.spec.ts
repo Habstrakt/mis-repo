@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import { LoginPage } from '../pages/login.page';
 import {fakerRU as faker} from "@faker-js/faker";
 
-let loginPage;
+let loginPage: LoginPage;
 
 test.beforeEach(async({page}) => {
   loginPage = new LoginPage(page);
@@ -38,4 +38,3 @@ test("Ввести существующий логин и неверный па�
   await expect(loginPage.errorPopUp).toBeVisible();
   await expect(loginPage.errorPopUp).toHaveText("Неверное имя пользователя или пароль");
 });
-
