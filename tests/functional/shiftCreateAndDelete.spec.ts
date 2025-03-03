@@ -26,13 +26,20 @@ test.beforeEach(async({page}) => {
 });
 
 test.afterEach(async({page}) => {
-  await page.locator("[title='Выделить все']").click();
-  await page.locator("[title='Удалить смены пакетом']").click();
-  await page.getByRole("button", { name: " Да" }).click();
-  await expect(page.getByText("Нет записей подходящих под условия")).toBeVisible();
+  const mainPage = new MainPage(page);
+
+  while (await mainPage.paginatorShift.isVisible()){
+    await test.step("Если отображается локатор пагинации, повторно удалить смены", async() => {
+      await mainPage.deleteAllShifts(page);
+    });
+  };
+
+  await test.step("В списке не отображается созданная/ые смены", async() => {
+    await expect(page.getByText("Нет записей подходящих под условия")).toBeVisible();
+  });
 });
 
-test.only("Создать смену врачу на определенный день", async({page}) => {
+test("Создать смену врачу на определенный день", async({page}) => {
   await test.step("Нажать на кнопку 'Создать'", async() => {
     await mainPage.createShiftButton.click();
   })
@@ -55,11 +62,10 @@ test.only("Создать смену врачу на определенный д
     for(const locator of locators) {
       await expect(locator).toBeVisible();
     }
-
   });
 });
 
-test.only("Создать смену врачу до конца месяца", async({page}) =>  {
+test("Создать смену врачу до конца месяца", async({page}) =>  {
 
   await test.step("Нажать на кнопку 'Создать пакетом'", async() => {
     await mainPage.createShiftPackageButton.click();
@@ -93,6 +99,9 @@ test.only("Создать смену врачу до конца месяца", a
   });
 });
 
+test("Создать смену врачу задним числом", async() => {
+
+});
 
 
 

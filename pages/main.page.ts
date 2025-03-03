@@ -20,6 +20,7 @@ export class MainPage {
   days: Locator;
   createShiftButton: Locator;
   createShiftPackageButton: Locator;
+  paginatorShift: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -32,7 +33,7 @@ export class MainPage {
     this.createShiftButton = page.getByRole('button', { name: ' Создать' });
     this.createShiftPackageButton = page.getByRole("button", { name: " Создать пакетом" });
 
-
+    this.paginatorShift = page.locator(".pagination");
   };
 
   async navigateToDoctorsSection() {
@@ -92,11 +93,9 @@ export class MainPage {
       await this.officeType.selectOption(officeType);
     });
 
-    if(specialization) {
-      await test.step("Выбрать специализацию врача", async() => {
-        await this.specialization.check();
-      })
-    };
+    await test.step("Выбрать специализацию врача", async() => {
+      await this.specialization.check();
+    });
   }
 
   async tomorrowDate() {
@@ -125,5 +124,17 @@ export class MainPage {
         }
       }
     }
-  }
+  };
+
+  async deleteAllShifts(page: Page) {
+    await test.step("Кликнуть на чекбокс, чтобы выделить все созданные смены", async() => {
+      await page.locator("[title='Выделить все']").click();
+    });
+    await test.step("Кликнуть на кнопку 'Удалить'", async() => {
+      await page.locator("[title='Удалить смены пакетом']").click();
+    });
+    await test.step("Кликнуть на кнопку 'Да'", async() => {
+      await page.getByRole("button", { name: " Да" }).click();
+    });
+  };
 };
