@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
 
 export class LoginPage {
   protected page: Page;
@@ -21,5 +21,12 @@ export class LoginPage {
     await this.loginInput.fill(username);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
+  }
+
+  async logout() {
+    await this.page.locator("[data-confirm='Выйти из системы?']").click();
+    await this.page.getByRole("link", {name: "Выход"}).click();
+    await this.page.locator("[title='Согласиться']").click();
+    expect(this.page.url()).toMatch(/login/)
   }
 }
