@@ -30,14 +30,44 @@ test.beforeEach(async({page}) => {
   });
 });
 
-test("Удалить смены", async({page}) => {
-  while (await shiftPage.paginatorShift.isVisible()){
-    await test.step("Если отображается локатор пагинации, повторно удалить смены", async() => {
-      await shiftPage.deleteAllShifts(page);
-    });
-  };
-  await shiftPage.deleteAllShifts(page);
-  await test.step("В списке не отображается созданная/ые смены", async() => {
-    await expect(page.getByText("Нет записей подходящих под условия")).toBeVisible();
-  });
+// test.only("Удалить смены", async({page}) => {
+//   while (await shiftPage.paginatorShift.isVisible()){
+//     await test.step("Если отображается локатор пагинации, повторно удалить смены", async() => {
+//       await shiftPage.deleteAllShifts(page);
+//     });
+//   };
+
+//   await test.step("В списке не отображается созданная/ые смены", async() => {
+//     await expect(page.getByText("Нет записей подходящих под условия")).toBeVisible();
+//   });
+// });
+
+test("Удалить смены", async ({ page }) => {
+  const shiftPage = new ShiftPage(page);
+
+  while (true) {
+    if (await shiftPage.paginatorShift.isVisible()) {
+      await test.step("Если отображается пагинация, удалить смены", async () => {
+        await shiftPage.deleteAllShifts(page);
+      });
+      continue;
+    }
+
+    const shiftsCount = await page.locator(".show-preview").count();
+    if (shiftsCount > 0) {
+      await test.step("Если смены есть, но пагинации нет, удалить смены", async () => {
+        await shiftPage.deleteAllShifts(page);
+        await page.waitForTimeout(1000);
+      });
+      continue;
+    }
+
+    if (page.getByText("Нет записей подходящих под условия")) {
+      await test.step("Проверить, что смены удалены", async () => {
+        await expect(page.getByText("Нет записей подходящих под условия")).toBeVisible();
+      });
+      break;
+    }
+    break;
+  }
 });

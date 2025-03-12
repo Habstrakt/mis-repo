@@ -35,7 +35,7 @@ export class ShiftPage {
     const newPage = await this.page.context().waitForEvent('page');
     await newPage.waitForLoadState("domcontentloaded");
     await newPage.setViewportSize({ width: 1280, height: 720 });
-  
+
     this.startDate = newPage.locator("#id_sdate");
     this.endDate = newPage.locator("#id_edate");
     this.startTime = newPage.locator("#id_stime");
@@ -45,16 +45,16 @@ export class ShiftPage {
     this.specialization = newPage.locator("#id_doctype_0");
     this.headerText = newPage.locator(".header");
     this.saveButton = newPage.locator("[title='Сохранение графика']");
-  
+
     this.days = newPage.locator("[name='day']");
-  
+
     return newPage;
   }
 
 	async createShift() {
 		await test.step("Нажать на кнопку 'Создать'", async() => {
 				await this.createShiftButton.click();
-			})
+		})
 
 			let newPage: Page;
 			newPage = await this.newTab();
@@ -63,7 +63,7 @@ export class ShiftPage {
 			await expect(this.headerText).toHaveText("Создание смены врача");
 		});
 		await test.step("Заполнить форму", async() => {
-			await this.fillShiftForm(newPage, true, false, "08:00", "17:00", "Владивосток, МК Океанский проспект,90 (В)", "68");
+			await this.fillShiftForm(newPage, true, false, "Владивосток, МК Океанский проспект,90 (В)", "68");
 		});
 		await test.step("Нажать на кнопку 'Сохранить'", async() => {
 			await this.saveButton.click();
@@ -82,7 +82,7 @@ export class ShiftPage {
 			await expect(this.headerText).toHaveText("Создание смен врача Ветохина Светлана Ивановна");
 		});
 		await test.step("Заполнить форму", async() => {
-			await this.fillShiftForm(newPage, false, false, "08:00", "17:00", "Владивосток, МК Океанский проспект,90 (В)", "68");
+			await this.fillShiftForm(newPage, false, false, "Владивосток, МК Океанский проспект,90 (В)", "68");
 		});
 		await test.step("Убрать чекбоксы с дат, которые уже прошли", async() => {
 			await this.uncheckDaysBeforeCurrent(1);
@@ -96,12 +96,12 @@ export class ShiftPage {
     page: Page,
     date: boolean,
     prevDate: boolean,
-    startTime: string,
-    endTime: string,
     medicalOffice: string,
     officeType: string,
     specialization: boolean = true,
   ) {
+    const { startTime, endTime } = await this.calculateShiftTimes();
+
     if(date) {
       await test.step("Установить дату начало смены и окончание смены на следующий день", async() => {
         const nextDay = await this.tomorrowDate();
@@ -133,9 +133,22 @@ export class ShiftPage {
     });
   };
 
+  async calculateShiftTimes() {
+    const currentDate = new Date();
+    let startHour = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+    if (currentMinutes > 0) {
+      startHour += 1;
+    }
+    const startTime = `${String(startHour).padStart(2, '0')}:00`;
+    const endHour = (startHour + 6) % 24;
+    const endTime = `${String(endHour).padStart(2, '0')}:00`;
+    return { startTime, endTime };
+  }
+
   async tomorrowDate() {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 1);
+    //currentDate.setDate(currentDate.getDate() + 1);
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
     const day = String(currentDate.getDate()).padStart(2, '0');

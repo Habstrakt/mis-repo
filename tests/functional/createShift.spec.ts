@@ -30,7 +30,7 @@ test.afterEach(async({page}) => {
   await shiftPage.deleteAllShifts(page);
 });
 
-test("Создать смену врачу на определенный день", async({page}) => {
+test("Создать смену врачу на текущий день", async({page}) => {
   await test.step("Создать смену врачу на завтра", async() => {
     await shiftPage.createShift();
   });
